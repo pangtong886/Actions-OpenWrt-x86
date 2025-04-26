@@ -15,7 +15,6 @@ sed -i 's/192.168.11.1/192.168.11.201/g' package/base-files/files/bin/config_gen
 #sed -i "s/.*PKG_VERSION:=.*/PKG_VERSION:=4.3.9_v1.2.14/" package/lean/qBittorrent-static/Makefile
 #sed -i "s/.*PKG_VERSION:=.*/PKG_VERSION:=5.0.0-stable/" package/libs/wolfssl/Makefile
 # welcome test
-#!/bin/bash
 # ========= 自定义脚本（在 feeds update 之后执行）=========
 # 注意：此脚本默认在 openwrt 根目录下执行
 
