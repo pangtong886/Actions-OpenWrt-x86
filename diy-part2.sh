@@ -20,8 +20,9 @@ mkdir -p package/kernel
 rm -rf package/kernel/rtl8821ce
 git clone https://github.com/tomaspinho/rtl8821ce.git package/kernel/rtl8821ce
 
-# 第二步：修复 get_sources.sh，改为 HTTPS 拉取
-sed -i 's|git@github.com:|https://github.com/|g' package/kernel/rtl8821ce/get_sources.sh
+# 第二步：修复 get_sources.sh，改为 HTTPS 拉取 Realtek 官方源码
+# 防止 GitHub Actions Runner 无 SSH Key 导致拉取失败
+sed -i 's#git@github.com:endlessm/linux.git#https://github.com/endlessm/linux.git#' package/kernel/rtl8821ce/get_sources.sh
 
 # 第三步：执行 get_sources.sh 拉取 Realtek 官方源码
 cd package/kernel/rtl8821ce
@@ -96,6 +97,9 @@ else
 fi
 EOF
 chmod +x check-rtl8821ce.sh
+
+# 后续在编译完成后执行： ./check-rtl8821ce.sh
+
 
 # 后续在编译完成后执行： ./check-rtl8821ce.sh
 
