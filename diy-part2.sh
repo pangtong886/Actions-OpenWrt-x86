@@ -20,18 +20,23 @@ mkdir -p package/kernel
 rm -rf package/kernel/rtl8821ce
 git clone https://github.com/tomaspinho/rtl8821ce.git package/kernel/rtl8821ce
 
-# 第二步：修复 get_sources.sh 中的 SSH 拉取地址为 HTTPS
+# 第二步：修复 get_sources.sh，改为 HTTPS 拉 endlessm/linux
 sed -i 's#git@github.com:endlessm/linux.git#https://github.com/endlessm/linux.git#' package/kernel/rtl8821ce/get_sources.sh
 
 # 第三步：执行 get_sources.sh 拉取 Realtek 官方源码
 cd package/kernel/rtl8821ce
 bash get_sources.sh
 
-# 检测拉取源码是否成功
+# 检查源码是否成功拉取
 if [ ! -d "linux/drivers/net/wireless/rtl8821ce" ]; then
   echo "[ERROR] Realtek官方源码拉取失败，目录不存在！"
   exit 1
 fi
+
+# 把拉下来的 rtl8821ce 驱动源码复制到当前目录
+cp -r linux/drivers/net/wireless/rtl8821ce/* .
+# 清理临时linux目录
+rm -rf linux
 cd ../../../
 
 # 第四步：创建适配 OpenWrt 编译的 Makefile
@@ -79,7 +84,7 @@ echo "CONFIG_PACKAGE_rtl8821ce-firmware=y" >> .config
 # 合并配置
 make defconfig
 
-# 提示：diy-part2.sh 执行完成
+# 提示：diy-part2.sh 执行完毕
 echo "[INFO] diy-part2.sh 执行完毕，已拉取驱动并配置好编译环境。"
 
 # 第六步：编译完成后检测 RTL8821CE 模块是否成功生成
@@ -96,4 +101,4 @@ fi
 EOF
 chmod +x check-rtl8821ce.sh
 
-# 后续在编译完成后执行： ./check-rtl8821ce.sh
+# 后续在编译完成后，在 GitHub Actions 中添加步骤执行： ./check-rtl8821ce.sh
