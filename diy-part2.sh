@@ -15,32 +15,33 @@ sed -i 's/192.168.11.1/192.168.11.201/g' package/base-files/files/bin/config_gen
 #sed -i "s/.*PKG_VERSION:=.*/PKG_VERSION:=4.3.9_v1.2.14/" package/lean/qBittorrent-static/Makefile
 #sed -i "s/.*PKG_VERSION:=.*/PKG_VERSION:=5.0.0-stable/" package/libs/wolfssl/Makefile
 # welcome test
-# ========= 自定义脚本（在 feeds update 之后执行）=========
+#!/bin/bash
+# ========= 自定义脚本（在 feeds update 后执行）=========
 # 注意：此脚本默认在 openwrt 根目录下执行
 
-echo ">>> 开始自定义配置: 导入 iStoreOS 驱动包..."
+echo ">>> 开始自定义配置: 导入 rtw88-oot 驱动..."
 
-# 克隆 iStoreOS 仓库（只拉取 istoreos-22.03 分支）
-git clone --depth=1 --single-branch --branch istoreos-22.03 https://github.com/istoreos/istoreos.git tmp_istoreos
-
-# 复制 iStoreOS 的 package/kernel 下所有驱动
-if [ -d "tmp_istoreos/package/kernel" ]; then
-    mkdir -p package/kernel/
-    cp -rf tmp_istoreos/package/kernel/* package/kernel/
-    echo ">>> 成功复制 iStoreOS package/kernel/ 目录下所有驱动！"
-else
-    echo "!!! 错误: 未找到 tmp_istoreos/package/kernel/ 目录，可能 clone 失败。"
-    exit 1
-fi
-
-# 清理临时目录
+# 克隆 iStoreOS 仓库（只拉 package/kernel/rtw88-oot 子目录）
+mkdir -p package/kernel/
+git clone --depth=1 --filter=blob:none --sparse https://github.com/istoreos/istoreos.git tmp_istoreos
+cd tmp_istoreos
+git sparse-checkout set package/kernel/rtw88-oot
+cp -r package/kernel/rtw88-oot ../../package/kernel/
+cd ..
 rm -rf tmp_istoreos
 
-# 添加你想默认启用的驱动（这里以 kmod-rtl8821ce 为例）
-# 如果想启用更多，按需追加 echo 语句
-echo "CONFIG_PACKAGE_kmod-rtl8821ce=y" >> .config
-# echo "CONFIG_PACKAGE_kmod-你的其他驱动=y" >> .config
+echo ">>> 成功复制 rtw88-oot 驱动到 package/kernel/ 目录。"
 
-# 更新配置文件
+# 删除原本的 rtw88-usb 配置（如果存在）
+sed -i '/CONFIG_PACKAGE_kmod-rtw88-usb/d' .config
+
+# 禁用内核原生 rtw88-usb
+echo "# CONFIG_PACKAGE_kmod-rtw88-usb is not set" >> .config
+
+# 启用新的 rtw88-oot 驱动
+echo "CONFIG_PACKAGE_kmod-rtw88-oot=y" >> .config
+
+# 更新配置
 make defconfig
+
 echo ">>> diy-part2.sh 自定义配置完成！"
