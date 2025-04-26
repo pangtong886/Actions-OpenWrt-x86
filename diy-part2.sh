@@ -18,7 +18,7 @@ sed -i 's/192.168.11.1/192.168.11.201/g' package/base-files/files/bin/config_gen
 # 第一步：拉取适配 OpenWrt 的稳定版 RTL8821CE 驱动源码到 package/kernel 目录下
 mkdir -p package/kernel
 rm -rf package/kernel/rtl8821ce
-git clone https://github.com/Broly1/rtl8821ce.git package/kernel/rtl8821ce
+git clone https://github.com/tomaspinho/rtl8821ce.git package/kernel/rtl8821ce
 
 # （Broly1 版本已包含完整源码，无需额外 get_sources.sh 拉取步骤）
 
